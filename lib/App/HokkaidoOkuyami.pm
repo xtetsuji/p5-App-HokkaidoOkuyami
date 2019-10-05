@@ -9,7 +9,10 @@ use HTTP::Tiny;
 use constant USER_AGENT => "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1";
 use constant SITE_URL => "https://www.hokkaidookuyami.com";
 use constant ARCHIVE_URL => "https://www.xn--t8jvfoa6156axlf83n4jap08f0w5e.com"; # 北海道お悔やみ情報.com
-use constant DAY_SELECT_URL => ARCHIVE_URL . "/p/blog-page_697.html";
+use constant MONTH_SELECT_URL => ARCHIVE_URL . "/p/blog-page_697.html";
+use constant DEBUG => 1;
+
+use Data::Dumper;
 
 our $VERSION = "0.01";
 
@@ -26,36 +29,71 @@ sub run($class, @args) {
     $self->ua();
 }
 
+sub month_links($self) {
+    my $response = $self->request( GET => MONTH_SELECT_URL );
+    die if !$response->{success};
+    my %url;
+    for my $line (split /\n/, $response->{content}) {
+        $line =~ m{
+            <a \s+ href="
+                (?<url>https://www\.xn--t8jvfoa6156axlf83n4jap08f0w5e\.com/.*)
+            ">
+            .*?
+            (?<year>20\d\d)年(?<month>\d\d?)月
+            .*?
+            </a>
+        }x or next;
+        $url{ sprintf "%04d%02d", $+{year}, $+{month} } = $+{url};
+        # print "$+{url} / $+{year} $+{month}\n";
+    }
+}
+
 sub request($self, $method, $url, @args) {
     if ( $method eq 'GET' && $self->is_cache_exist($url) ) {
+        if ( DEBUG ) {
+            warn "use cache";
+            sleep 1;
+        }
         return $self->read_cache($url);
     }
     my $response = $self->ua->request($method, $url, @args);
     if ( $method eq 'GET' && $response->{success} && $self->{cache} ) {
-        $self->write_cache($response->{content});
+        if ( DEBUG ) {
+            warn "write_cache to " . $self->cache_filename($url);
+            sleep 1;
+        }
+        $self->write_cache($url, $response->{content});
     }
+    return $response;
 }
 
 sub read_cache($self, $url) {
     my $cache_filename = $self->cache_filename($url);
+    if ( DEBUG ) {
+        warn "cache_filename = $cache_filename\n";
+        sleep 3;
+    }
     if ( !-f $cache_filename ) {
         return;
     }
     my $fh = IO::File->new($cache_filename, "r");
-    return join "", $fh->getlines();
+    warn "make fake response" if DEBUG;
+    return +{
+        content => join( "", $fh->getlines() ),
+        success => 1,
+        cache   => 1,
+    };
 }
 
 sub write_cache($self, $url, $content) {
     my $cache_filename = $self->cache_filename($url);
-    if ( !-f $cache_filename ) {
-        return;
-    }
+    # TODO: 上書き判定
     my $fh = IO::File->new($cache_filename, "w");
     $fh->print($content);
 }
 
 sub is_cache_exist($self, $url) {
-    return -f $self->cache_filename();
+    return -f $self->cache_filename($url);
 }
 
 sub cache_filename($self, $url) {
