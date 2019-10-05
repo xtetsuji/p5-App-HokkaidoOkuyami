@@ -46,6 +46,7 @@ sub month_links($self) {
         $url{ sprintf "%04d%02d", $+{year}, $+{month} } = $+{url};
         # print "$+{url} / $+{year} $+{month}\n";
     }
+    return wantarray ? %url : \%url;
 }
 
 sub request($self, $method, $url, @args) {
