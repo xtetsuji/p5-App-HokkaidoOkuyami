@@ -30,7 +30,7 @@ sub request($self, $method, $url, @args) {
     if ( $method eq 'GET' && $self->is_cache_exist($url) ) {
         return $self->read_cache($url);
     }
-    my $response = $self->ua->request($method, $url);
+    my $response = $self->ua->request($method, $url, @args);
     if ( $method eq 'GET' && $response->{success} && $self->{cache} ) {
         $self->write_cache($response->{content});
     }
