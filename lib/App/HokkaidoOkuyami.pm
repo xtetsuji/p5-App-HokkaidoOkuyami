@@ -9,6 +9,7 @@ use HTTP::Tiny;
 use constant USER_AGENT => "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1";
 use constant SITE_URL => "https://www.hokkaidookuyami.com";
 use constant ARCHIVE_URL => "https://www.xn--t8jvfoa6156axlf83n4jap08f0w5e.com"; # 北海道お悔やみ情報.com
+use constant DAY_SELECT_URL => ARCHIVE_URL . "/p/blog-page_697.html";
 
 our $VERSION = "0.01";
 
@@ -69,9 +70,6 @@ sub ua($self) {
 }
 
 sub get_url($type) {
-    if ($type eq "day_select") {
-        return ARCHIVE_URL . "/p/blog-page_697.html";
-    }
 }
 
 1;
