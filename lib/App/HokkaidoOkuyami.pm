@@ -116,6 +116,9 @@ sub okuyami_persons($self, $year, $month, $day) {
     $content =~ s{<script .*?>.*?</script\s*>}{}gs;
     # 本文と同じような「〜〜様」を伴った行が、script 要素中に JSON として表れて
     # 意図せず引っ掛けてしまうので予め除外しておく
+    $content =~ s{<br\s*/?>}{}g;
+    # div の内容の末尾に <br> が混入しているケースあり
+    # そのまま除去で良い
 
     # www.北海道お悔やみ情報.com 用
     $content =~ s{</?span.*?>}{}gs;
