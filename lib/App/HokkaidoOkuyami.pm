@@ -158,7 +158,7 @@ sub okuyami_persons($self, $year, $month, $day) {
             @row{qw/name age address funeral_info/} = @row_data;
         } else { # 想定外のケース
             warn "okuyami_persons: unexpected line ($line_number)\n>>> $line\n";
-            return;
+            next;
         }
 
         # \s* だと名前の3バイト文字の最後の 0xA0 も削ってしまう
