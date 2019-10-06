@@ -127,7 +127,7 @@ sub okuyami_persons($self, $year, $month, $day) {
             $current_region = $+{region};
             next;
         }
-        if ( $line !~ m{ (?:\s|&nbsp;) \s* 様 / }x ) {
+        if ( $line !~ m{ (?:[ ]|&nbsp;) [ ]* 様 / }x ) {
             next;
         }
 
@@ -136,7 +136,8 @@ sub okuyami_persons($self, $year, $month, $day) {
 
         my %row;
         @row{qw/name age address died_at funeral_info/} = split m{/}, $line;
-        $row{name} =~ s/(?:&nbsp;)?\s*様//;
+        # \s* だと名前の3バイト文字の最後の 0xA0 も削ってしまう
+        $row{name} =~ s/(?:&nbsp;|[ ])*様//;
         $row{region} = $current_region;
 
         push @persons, \%row;
