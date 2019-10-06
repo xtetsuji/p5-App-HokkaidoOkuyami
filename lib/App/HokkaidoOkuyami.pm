@@ -123,6 +123,9 @@ sub okuyami_persons($self, $year, $month, $day) {
     # HTML上では長大な1行になっている用
     $content =~ s{(?=<div\b)}{\n}g;
 
+    # 連結されるべきでない行の分割（葬儀終了で終わらない場合のみ）
+    $content =~ s{(?<=葬儀終了)(?=[^\n])}{\n}g;
+
     my $current_region;
     my @persons;
     for my $line (split /\n/, $content) {
