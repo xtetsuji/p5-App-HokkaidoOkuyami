@@ -215,9 +215,6 @@ sub ua($self) {
     return $self->{ua};
 }
 
-sub get_url($type) {
-}
-
 1;
 __END__
 
