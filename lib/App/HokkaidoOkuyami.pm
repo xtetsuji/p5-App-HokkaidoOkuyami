@@ -106,7 +106,7 @@ sub okuyami_persons($self, $year, $month, $day) {
     if ( !$url ) {
         die "okuyami_persons: date_page_url is not found";
     }
-    warn "date_page_url = $url";
+    warn "date_page_url = $url" if DEBUG;
     my $response = $self->request( GET => $url );
 
     my $content = $response->{content};
