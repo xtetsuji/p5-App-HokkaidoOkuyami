@@ -80,7 +80,11 @@ sub day_links($self, $year, $month) {
     for my $line (split /\n/, $response->{content}) {
         $line =~ m{
             <a \s+ href="
-                (?<url>https://www\.xn--t8jvfoa6156axlf83n4jap08f0w5e\.com/.*?)
+                (?<url>
+                    https://www\.xn--t8jvfoa6156axlf83n4jap08f0w5e\.com/.*?
+                    |
+                    https://www\.hokkaidookuyami\.com/.*?
+                )
             ">
             .*?
             (?<day>\d\d?)日
@@ -99,13 +103,22 @@ sub date_page_url($self, $year, $month, $day) {
 
 sub okuyami_persons($self, $year, $month, $day) {
     my $url = $self->date_page_url($year, $month, $day);
+    if ( !$url ) {
+        die "okuyami_persons: date_page_url is not found";
+    }
+    warn "date_page_url = $url";
     my $response = $self->request( GET => $url );
 
     my $content = $response->{content};
 
     $content =~ s{\A.*(?=<body)}{}is;
+
+    # www.北海道お悔やみ情報.com 用
     $content =~ s{</?span.*?>}{}gs;
     $content =~ s{\bstyle=".*?"}{}gs;
+
+    # www.hokkaidookuyami.com 用
+    $content =~ s{</?p\b.*?>}{}gs;
 
     my $current_region;
     my @persons;
