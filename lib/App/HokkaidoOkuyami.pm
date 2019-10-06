@@ -123,9 +123,6 @@ sub okuyami_persons($self, $year, $month, $day) {
     # HTML上では長大な1行になっている用
     $content =~ s{(?=<div\b)}{\n}g;
 
-    print $content, "\n";
-    sleep 3;
-
     my $current_region;
     my @persons;
     for my $line (split /\n/, $content) {
@@ -142,10 +139,22 @@ sub okuyami_persons($self, $year, $month, $day) {
         $line =~ s{<div\b.*?>}{};
 
         my %row;
-        @row{qw/name age address died_at funeral_info/} = split m{/}, $line;
+        my @row_data = split m{/}, $line;
+        if ( @row_data == 5 ) { # 通常のケース
+            @row{qw/name age address died_at funeral_info/} = @row_data;
+        } elsif ( @row_data == 4 ) { # 死去日が欠けているケース
+            @row{qw/name age address funeral_info/} = @row_data;
+        } else { # 想定外のケース
+            warn "okuyami_persons: unexpected line\n>>> $line\n";
+            return;
+        }
+
         # \s* だと名前の3バイト文字の最後の 0xA0 も削ってしまう
         $row{name} =~ s/(?:&nbsp;|[ ])*様//;
         s/&nbsp;/ /g, s/^ +//, s/ +$// for values %row;
+        for (values %row) {
+            warn "undefined $line\n" if !defined;
+        }
         $row{region} = $current_region;
 
         push @persons, \%row;
