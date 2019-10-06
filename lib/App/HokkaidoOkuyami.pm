@@ -28,7 +28,6 @@ sub new($class) {
 
 sub run($class, @args) {
     local @ARGV = @args;
-    print "ARGV = @ARGV\n";
     GetOptions(
         \my %opt,
         "date=s"
