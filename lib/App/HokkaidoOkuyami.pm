@@ -10,7 +10,7 @@ use constant USER_AGENT => "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleW
 use constant SITE_URL => "https://www.hokkaidookuyami.com";
 use constant ARCHIVE_URL => "https://www.xn--t8jvfoa6156axlf83n4jap08f0w5e.com"; # 北海道お悔やみ情報.com
 use constant MONTH_SELECT_URL => ARCHIVE_URL . "/p/blog-page_697.html";
-use constant DEBUG => 1;
+use constant DEBUG => $ENV{DEBUG};
 
 use Data::Dumper;
 
@@ -71,6 +71,45 @@ sub day_links($self, $year, $month) {
         $url{ sprintf "%02d", $+{day} } = $+{url};
     }
     return wantarray ? %url : \%url;
+}
+
+sub date_page_url($self, $year, $month, $day) {
+    my %day_links = $self->day_links($year, $month);
+    return $day_links{ sprintf "%02d", $day };
+}
+
+sub okuyami_persons($self, $year, $month, $day) {
+    my $url = $self->date_page_url($year, $month, $day);
+    my $response = $self->request( GET => $url );
+
+    my $content = $response->{content};
+
+    $content =~ s{\A.*(?=<body)}{}is;
+    $content =~ s{</?span.*?>}{}gs;
+    $content =~ s{\bstyle=".*?"}{}gs;
+
+    my $current_region;
+    my @persons;
+    for my $line (split /\n/, $content) {
+        if ( $line =~ m{ (?:&\#9679;|●) (?<region>.*?) (?:&\#9679;|●) }x ) {
+            $current_region = $+{region};
+            next;
+        }
+        if ( $line !~ m{ (?:\s|&nbsp;) \s* 様 / }x ) {
+            next;
+        }
+
+        chomp $line;
+        $line =~ s{</div>$}{};
+
+        my %row;
+        @row{qw/name age address died_at funeral_info/} = split m{/}, $line;
+        $row{name} =~ s/(?:&nbsp;)?\s*様//;
+        $row{region} = $current_region;
+
+        push @persons, \%row;
+    }
+    return wantarray ? @persons : \@persons;
 }
 
 sub request($self, $method, $url, @args) {
