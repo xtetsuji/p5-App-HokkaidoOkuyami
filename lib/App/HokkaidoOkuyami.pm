@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
+use Getopt::Long qw(:config posix_default no_ignore_case bundling auto_help);
 use IO::File;
 use HTTP::Tiny;
 use constant USER_AGENT => "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1";
@@ -25,8 +26,26 @@ sub new($class) {
 }
 
 sub run($class, @args) {
-    my $self = $class->new(@args);
-    $self->ua();
+    local @ARGV = @args;
+    print "ARGV = @ARGV\n";
+    GetOptions(
+        \my %opt,
+        "date=s"
+    );
+    my $date = $opt{date}
+        or die "specify --date paramter\n";
+    my @date_parts = $date =~ /^(\d\d\d\d)(\d\d)(\d\d)$/
+        or die "--date option format error\n";
+    my ($year, $month, $day) = map { $_+0 } @date_parts;
+
+    my $self = $class->new();
+    my @persons = $self->okuyami_persons( $year, $month, $day);
+
+    for my $person (@persons) {
+        say join "\t", @$person{
+            qw/name age region address died_at funeral_info/
+        }; # TODO: ここにおくやみ日を入れる？
+    }
 }
 
 sub month_links($self) {
