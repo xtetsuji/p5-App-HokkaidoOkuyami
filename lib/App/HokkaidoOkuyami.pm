@@ -42,7 +42,7 @@ sub run($class, @args) {
     my @persons = $self->okuyami_persons( $year, $month, $day);
 
     for my $person (@persons) {
-        say join "\t", @$person{
+        say join "\t", map { defined $_ ? $_ : "-" } @$person{
             qw/name age region address died_at funeral_info/
         }; # TODO: ここにおくやみ日を入れる？
     }
@@ -111,7 +111,11 @@ sub okuyami_persons($self, $year, $month, $day) {
 
     my $content = $response->{content};
 
+    # 全体用
     $content =~ s{\A.*(?=<body)}{}is;
+    $content =~ s{<script .*?>.*?</script\s*>}{}gs;
+    # 本文と同じような「〜〜様」を伴った行が、script 要素中に JSON として表れて
+    # 意図せず引っ掛けてしまうので予め除外しておく
 
     # www.北海道お悔やみ情報.com 用
     $content =~ s{</?span.*?>}{}gs;
@@ -128,7 +132,9 @@ sub okuyami_persons($self, $year, $month, $day) {
 
     my $current_region;
     my @persons;
+    my $line_number = 0;
     for my $line (split /\n/, $content) {
+        $line_number++;
         if ( $line =~ m{ (?:&\#9679;|●) (?<region>.*?) (?:&\#9679;|●) }x ) {
             $current_region = $+{region};
             next;
@@ -148,7 +154,7 @@ sub okuyami_persons($self, $year, $month, $day) {
         } elsif ( @row_data == 4 ) { # 死去日が欠けているケース
             @row{qw/name age address funeral_info/} = @row_data;
         } else { # 想定外のケース
-            warn "okuyami_persons: unexpected line\n>>> $line\n";
+            warn "okuyami_persons: unexpected line ($line_number)\n>>> $line\n";
             return;
         }
 
