@@ -49,6 +49,30 @@ sub month_links($self) {
     return wantarray ? %url : \%url;
 }
 
+sub day_links($self, $year, $month) {
+    my %day_link_url_of = $self->month_links();
+    my $day_link_url = $day_link_url_of{ sprintf "%04d%02d", $year, $month };
+
+    # $self->{cache} = 0;
+    my $response = $self->request( GET => $day_link_url );
+    # print $response->{content} =~ s/^/> /gmr;
+
+    my %url;
+    for my $line (split /\n/, $response->{content}) {
+        $line =~ m{
+            <a \s+ href="
+                (?<url>https://www\.xn--t8jvfoa6156axlf83n4jap08f0w5e\.com/.*?)
+            ">
+            .*?
+            (?<day>\d\d?)日
+            .*?
+            </a>
+        }x or next;
+        $url{ sprintf "%02d", $+{day} } = $+{url};
+    }
+    return wantarray ? %url : \%url;
+}
+
 sub request($self, $method, $url, @args) {
     if ( $method eq 'GET' && $self->is_cache_exist($url) ) {
         if ( DEBUG ) {
