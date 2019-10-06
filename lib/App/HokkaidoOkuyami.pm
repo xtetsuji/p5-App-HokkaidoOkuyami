@@ -7,6 +7,7 @@ no warnings qw(experimental::signatures);
 use Getopt::Long qw(:config posix_default no_ignore_case bundling auto_help);
 use IO::File;
 use HTTP::Tiny;
+use Time::HiRes qw(time sleep);
 use constant USER_AGENT => "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1";
 use constant SITE_URL => "https://www.hokkaidookuyami.com";
 use constant ARCHIVE_URL => "https://www.xn--t8jvfoa6156axlf83n4jap08f0w5e.com"; # 北海道お悔やみ情報.com
@@ -153,6 +154,7 @@ sub request($self, $method, $url, @args) {
         }
         return $self->read_cache($url);
     }
+    $self->wait_between_request();
     my $response = $self->ua->request($method, $url, @args);
     if ( $method eq 'GET' && $response->{success} && $self->{cache} ) {
         if ( DEBUG ) {
@@ -162,6 +164,15 @@ sub request($self, $method, $url, @args) {
         $self->write_cache($url, $response->{content});
     }
     return $response;
+}
+
+sub wait_between_request($self) {
+    my $prev = $self->{previous_request_time};
+    my $now  = time;
+    if ( $prev && $now - $prev < 2 ) {
+        sleep $now - $prev;
+    }
+    $self->{previous_request_time} = time;
 }
 
 sub read_cache($self, $url) {
