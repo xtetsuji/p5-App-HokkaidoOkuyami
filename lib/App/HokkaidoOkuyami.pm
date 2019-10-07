@@ -19,10 +19,11 @@ use Data::Dumper;
 our $VERSION = "0.01";
 
 sub new($class) {
-    my $self = {};
+    my $self = {
+        cache => 1,
+        cache_dir => "/tmp",
+    };
     bless $self, $class;
-    $self->{cache} = 1;
-    $self->{cache_dir} = "/tmp";
     return $self;
 }
 
@@ -30,7 +31,9 @@ sub run($class, @args) {
     local @ARGV = @args;
     GetOptions(
         \my %opt,
-        "date=s"
+        "date=s",
+        "no-cache",
+        "cache-dir=s",
     );
     my $date = $opt{date}
         or die "specify --date paramter\n";
@@ -39,6 +42,22 @@ sub run($class, @args) {
     my ($year, $month, $day) = map { $_+0 } @date_parts;
 
     my $self = $class->new();
+
+    if ( $opt{"no-cache"} ) {
+        $self->{cache} = 0;
+        delete $self->{cache_dir};
+        if ( $opt{"cache-dir"} ) {
+            # no-cache と cache-dir を同時に指定するのはおかしい
+            die "no-cache and cache-dir can not be specified together\n";
+        }
+    }
+    if ( $opt{"cache-dir"} ) {
+        if ( !-d $opt{"cache-dir"} ) {
+            die "cache-dir=$opt{'cache-dir'} is not found\n";
+        }
+        $self->{cache}     = 1;
+        $self->{cache_dir} = $opt{"cache-dir"};
+    }
     my @persons = $self->okuyami_persons( $year, $month, $day);
 
     for my $person (@persons) {
@@ -175,7 +194,7 @@ sub okuyami_persons($self, $year, $month, $day) {
 }
 
 sub request($self, $method, $url, @args) {
-    if ( $method eq 'GET' && $self->is_cache_exist($url) ) {
+    if ( $self->{cache} && $method eq 'GET' && $self->is_cache_exist($url) ) {
         if ( DEBUG ) {
             warn "use cache";
             sleep 1;
@@ -184,7 +203,7 @@ sub request($self, $method, $url, @args) {
     }
     $self->wait_between_request();
     my $response = $self->ua->request($method, $url, @args);
-    if ( $method eq 'GET' && $response->{success} && $self->{cache} ) {
+    if ( $self->{cache} && $method eq 'GET' && $response->{success} && $self->{cache} ) {
         if ( DEBUG ) {
             warn "write_cache to " . $self->cache_filename($url);
             sleep 1;
