@@ -14,8 +14,6 @@ use constant ARCHIVE_URL => "https://www.xn--t8jvfoa6156axlf83n4jap08f0w5e.com";
 use constant MONTH_SELECT_URL => ARCHIVE_URL . "/p/blog-page_697.html";
 use constant DEBUG => $ENV{DEBUG};
 
-use Data::Dumper;
-
 our $VERSION = "0.01";
 
 sub new($class) {
