@@ -1,5 +1,5 @@
 package App::HokkaidoOkuyami;
-use v5.22;
+use v5.20; # for subroutine signatures
 use strict;
 use warnings;
 use feature qw(signatures);
