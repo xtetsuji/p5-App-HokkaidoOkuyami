@@ -6,3 +6,55 @@ use lib qw(../lib lib);
 use App::HokkaidoOkuyami;
 
 App::HokkaidoOkuyami->run(@ARGV);
+
+=encoding utf-8
+
+=head1 NAME
+
+hokkaido-okuyami - Hokkaido Okuyami fetcher frontend
+
+=head1 SYNOPSIS
+
+    hokkaido-okuyami [--no-cache|cache-dir=DIR] --date=YYYYMMDD
+
+=head1 DESCRIPTION
+
+hokkaido-okuyami is L<Hokkaido Okuyami|https://www.hokkaidookuyami.com> fetcher frontend script.
+
+It uses App::HokkaidoOkuyami module.
+
+=head1 OPTIONS
+
+=head2 --date=YYYYMMDD
+
+This option specifies to want to fetch okuyami date.
+This option is required.
+
+=head2 --no-cache
+
+This option declare not to use cache.
+
+In default, script logic uses "/tmp" as cache directory.
+
+=head2 --cache-dir=DIRECTORY
+
+This option specifies cache directory as DIRECTORY.
+
+Both --no-cache option and --cache-dir option are dot specify at same time.
+
+=head1 LICENSE
+
+Copyright (C) OGATA Tetsuji.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+OGATA Tetsuji E<lt>tetsuji.ogata@gmail.comE<gt>
+
+=head1 SEEL ALSO
+
+L<App::HokkaidoOkuyami>
+
+=cut
