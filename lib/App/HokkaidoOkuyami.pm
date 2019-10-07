@@ -261,13 +261,28 @@ App::HokkaidoOkuyami - Hokkaido Okuyami fetcher backend
 
 App::HokkaidoOkuyami is L<Hokkaido Okuyami|https://www.hokkaidookuyami.com> fetcher backend module.
 
-If you use App::Hokkaido::Okuyami, then call run method at frontend script.
+If you use App::HokkaidoOkuyami, then call run method at frontend script.
+
+App::HokkaidoOkuyami is not opened its interfaces.
+In short, big change is planned.
 
 =head1 METHODS
 
+Following methods are partial.
+
+=head2 new
+
+Constructor, almost internal.
+
+It is expected that this is called in run method.
+
 =head2 run
 
+Front end script method.
 
+  App::HokkaidoOkuyami->run(@ARGV);
+
+It is not return any values.
 
 =head1 LICENSE
 
