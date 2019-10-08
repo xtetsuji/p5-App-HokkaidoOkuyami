@@ -32,6 +32,7 @@ sub run($class, @args) {
         "date=s",
         "no-cache",
         "cache-dir=s",
+        "show-url",
     );
     my $date = $opt{date}
         or die "specify --date paramter\n";
@@ -56,7 +57,13 @@ sub run($class, @args) {
         $self->{cache}     = 1;
         $self->{cache_dir} = $opt{"cache-dir"};
     }
-    my @persons = $self->okuyami_persons( $year, $month, $day);
+
+    if ( $opt{"show-url"} ) {
+        print $self->date_page_url($year, $month, $day), "\n";
+        return;
+    }
+
+    my @persons = $self->okuyami_persons($year, $month, $day);
 
     for my $person (@persons) {
         say join "\t", map { defined $_ ? $_ : "-" } @$person{

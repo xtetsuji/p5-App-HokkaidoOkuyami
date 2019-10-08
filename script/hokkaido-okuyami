@@ -18,7 +18,7 @@ hokkaido-okuyami - Hokkaido Okuyami fetcher frontend
 
 =head1 SYNOPSIS
 
-    hokkaido-okuyami [--no-cache|cache-dir=DIR] --date=YYYYMMDD
+    hokkaido-okuyami [--no-cache|cache-dir=DIR|show-url] --date=YYYYMMDD
 
 =head1 DESCRIPTION
 
@@ -44,6 +44,10 @@ In default, script logic uses "/tmp" as cache directory.
 This option specifies cache directory as DIRECTORY.
 
 Both --no-cache option and --cache-dir option are dot specify at same time.
+
+=head2 --show-url
+
+This option let script outputs only URL.
 
 =head1 LICENSE
 
