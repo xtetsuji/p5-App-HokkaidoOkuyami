@@ -4,6 +4,9 @@ use warnings;
 use feature qw(say);
 use lib qw(../lib lib);
 use App::HokkaidoOkuyami;
+use Pod::Usage qw(pod2usage);
+
+pod2usage(0) if !@ARGV;
 
 App::HokkaidoOkuyami->run(@ARGV);
 
