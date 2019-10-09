@@ -8,7 +8,7 @@ lib/App/HokkaidoOkuyami.pm はオブジェクト指向モジュールの書き�
 通常はスクリプト script/hokkaido-okuyami を通して使うことを想定しています。
 
 現状は App::HokkaidoOkuyami クラスのインターフェースを公開していません。
-つまり、バージョンによって大規模な改変を予定しています。
+つまり、バージョンアップによって大規模な改変を予定しています。
 
 # script/hokkaido-okuyami について
 
