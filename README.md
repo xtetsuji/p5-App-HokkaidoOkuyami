@@ -1,14 +1,27 @@
-# NAME
+# App::HokkaidoOkuyami
 
-App::HokkaidoOkuyami - It's new $module
+App::HokkaidoOkuyami は、
+指定年月日の北海道のお悔やみ情報をサイト[「北海道お悔やみ情報」](https://www.hokkaidookuyami.com)から
+取得するモジュールです。
 
-# SYNOPSIS
+lib/App/HokkaidoOkuyami.pm はオブジェクト指向モジュールの書き方となっていますが、
+通常はスクリプト script/hokkaido-okuyami を通して使うことを想定しています。
 
-    use App::HokkaidoOkuyami;
+現状は App::HokkaidoOkuyami クラスのインターフェースを公開していません。
+つまり、バージョンアップによって大規模な改変を予定しています。
 
-# DESCRIPTION
+# script/hokkaido-okuyami について
 
-App::HokkaidoOkuyami is ...
+script/hokkaido-okuyami は以下のように使用します。
+
+```
+$ script/hokkaido-okuyami --date=20190131
+```
+
+出力は、指定日時のタブ区切りテキストです。
+
+今後、機能追加で指定オプションを自由にしたり、
+出力フォーマットが変更されたり可変にしたりするかもしれません。
 
 # LICENSE
 
